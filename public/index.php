@@ -11,9 +11,12 @@ session_start();
 $app = AppFactory::create();
 
 $app->get('/', [Controllers\Main::class, 'index']);
+
 $app->post('/login', [Controllers\OpenID::class, 'start']);
 $app->post('/logout', [Controllers\OpenID::class, 'logout']);
 $app->get('/openid/callback/{id}', [Controllers\OpenID::class, 'redirect']);
+
+$app->post('/oauth/token', [Controllers\TokenEndpoint::class, 'token']);
 
 $app->group('', function(RouteCollectorProxy $group){
 
