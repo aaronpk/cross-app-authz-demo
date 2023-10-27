@@ -5,11 +5,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ORM;
 
-class Todos {
+class Wiki {
 
   public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
 
-    return render($response, 'todo/index', [
+    return render($response, 'wiki/index', [
 
     ]);
   }
@@ -17,9 +17,8 @@ class Todos {
   public function dashboard(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
 
     $user = $request->getAttribute('user');
-    $todos = ORM::for_table('todos')->where('user_id', $user->id)->find_many();
 
-    return render($response, 'todo/dashboard', [
+    return render($response, 'wiki/dashboard', [
       'user' => $user,
       'todos' => $todos,
     ]);
@@ -64,7 +63,7 @@ class Todos {
     $meta = '<meta property="og:title" content="TODO"/>';
     $meta = '<meta property="og:description" content="'.e($todo->name).'"/>';
 
-    return render($response, 'todo/todo', [
+    return render($response, 'wiki/page', [
       'meta' => $meta,
       'user' => $user,
       'todo' => $todo,
