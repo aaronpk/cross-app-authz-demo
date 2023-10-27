@@ -39,8 +39,9 @@ $app->group('', function(RouteCollectorProxy $group){
       $group->post('/todos/edit', [Controllers\Todos::class, 'edit']);
       break;
     case 'wiki':
-      $group->redirect('/logged-in', '/home');
-      $group->get('/home', [Controllers\Wiki::class, 'home']);
+      $group->redirect('/logged-in', '/wiki/');
+      $group->get('/wiki/', [Controllers\Wiki::class, 'home']);
+      $group->get('/wiki/{page}', [Controllers\Wiki::class, 'page']);
 
       break;
   }

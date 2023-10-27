@@ -18,15 +18,65 @@ class Wiki {
 
     $user = $request->getAttribute('user');
 
-    $html = 'hlelo';
+    $page = ORM::for_table('pages')
+      ->where('org_id', $user->org_id)
+      ->where('slug', '')
+      ->find_one();
 
-    // Load the home page or create if it doesn't exist
+    if(!$page) {
+      $page = ORM::for_table('pages')->create();
+      $page->org_id = $user->org_id;
+      $page->slug = '';
+      $page->text = "Welcome to your new wiki! Edit this page to get started. Things to try:\n\n* Create lists with markdown\n* Link to other pages by wrapping the page name in double square brackets";
+      $page->created_by = $user->id;
+      $page->created_at = date('Y-m-d H:i:s');
+      $page->save();
+    }
+
+    $html = $this->_renderWikiHTML($page);
 
     return render($response, 'wiki/page', [
       'page_html' => $html,
       'user' => $user,
     ]);
   }
+
+  public function page(ServerRequestInterface $request, ResponseInterface $response, $params): ResponseInterface {
+
+    $user = $request->getAttribute('user');
+
+    $page = ORM::for_table('pages')
+      ->where('org_id', $user->org_id)
+      ->where('slug', $params['page'])
+      ->find_one();
+
+    if(!$page) {
+      return $response->withStatus(404);
+    }
+
+
+    $html = $this->_renderWikiHTML($page);
+
+    return render($response, 'wiki/page', [
+      'page_html' => $html,
+      'user' => $user,
+    ]);
+  }
+
+  private function _renderWikiHTML(&$page) {
+
+    $html = htmlspecialchars($page->text);
+
+    return $html;
+  }
+
+
+
+
+  ///// TODO BELOW
+
+
+
 
   public function create(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
     $params = (array)$request->getParsedBody();
