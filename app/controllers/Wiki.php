@@ -21,25 +21,28 @@ class Wiki {
 
     $page = ORM::for_table('pages')
       ->where('org_id', $user->org_id)
-      ->where('slug', '')
+      ->where('slug', 'home')
       ->find_one();
 
     if(!$page) {
       $page = ORM::for_table('pages')->create();
       $page->org_id = $user->org_id;
-      $page->slug = '';
-      $page->text = "Welcome to your new wiki! Edit this page to get started. Things to try:\n\n* Create lists with markdown\n* Link to other pages by wrapping the page name in double square brackets";
+      $page->slug = 'home';
+      $page->text = "Welcome to your new wiki! Edit this page to get started. Things to try:\n\n* Create lists with [[markdown]]\n* Link to other pages by wrapping the page name in [[double square brackets]]";
+      $page->created_by = $user->id;
+      $page->created_at = date('Y-m-d H:i:s');
+      $page->save();
+
+      $page = ORM::for_table('pages')->create();
+      $page->org_id = $user->org_id;
+      $page->slug = 'markdown';
+      $page->text = "# Markdown Reference\nEdit this page to view the source\n\n* List\n* of\n* items\n\nLink to an internal page: [[home]]\n\n[External link](http://example.com)\n\n# Heading\n\n## Heading Level 2\n\n### Heading Level 3\n\n#### Heading Level 4\n\n**Bold**";
       $page->created_by = $user->id;
       $page->created_at = date('Y-m-d H:i:s');
       $page->save();
     }
 
-    $html = $this->_renderWikiHTML($page);
-
-    return render($response, 'wiki/page', [
-      'page_html' => $html,
-      'user' => $user,
-    ]);
+    return $this->page($request, $response, ['page' => 'home']);
   }
 
   public function page(ServerRequestInterface $request, ResponseInterface $response, $params): ResponseInterface {
@@ -52,30 +55,27 @@ class Wiki {
       ->find_one();
 
     if(!$page) {
-      // TODO: Show empty page editor
-      return $response->withStatus(404);
+      return $response->withStatus(302)
+        ->withHeader('Location', '/edit?page='.urlencode($params['page']));
     }
 
     $html = $this->_renderWikiHTML($page);
 
+    $links[] = [
+      'url' => '/edit?page='.urlencode($params['page']),
+      'name' => 'Edit',
+    ];
+
     return render($response, 'wiki/page', [
       'page_html' => $html,
       'user' => $user,
+      'navlinks' => $links,
     ]);
   }
 
   private function _renderWikiHTML(&$page) {
 
-    $converter = new CommonMarkConverter([
-      'html_input' => 'strip',
-      'allow_unsafe_links' => false,
-    ]);
-
     $text = $page->text;
-
-    logger()->debug($text);
-
-    // Preprocess
 
     // Convert wiki links to HTML links
     $text = preg_replace_callback('/\[\[(.+?)\]\]/', function($matches) {
@@ -83,7 +83,10 @@ class Wiki {
       return '['.$name.']('.$_ENV['BASE_URL'].'wiki/'.urlencode($name).')';
     }, $text);
 
-    logger()->debug($text);
+    $converter = new CommonMarkConverter([
+      'html_input' => 'strip',
+      'allow_unsafe_links' => false,
+    ]);
 
     $html = $converter->convert($text);
 
