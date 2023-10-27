@@ -42,6 +42,8 @@ $app->group('', function(RouteCollectorProxy $group){
       $group->redirect('/logged-in', '/wiki/');
       $group->get('/wiki/', [Controllers\Wiki::class, 'home']);
       $group->get('/wiki/{page}', [Controllers\Wiki::class, 'page']);
+      $group->get('/edit', [Controllers\Wiki::class, 'edit']);
+      $group->post('/edit/save', [Controllers\Wiki::class, 'save']);
 
       break;
   }

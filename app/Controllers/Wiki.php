@@ -62,6 +62,11 @@ class Wiki {
     $html = $this->_renderWikiHTML($page);
 
     $links[] = [
+      'url' => '/wiki/',
+      'name' => 'Home',
+    ];
+
+    $links[] = [
       'url' => '/edit?page='.urlencode($params['page']),
       'name' => 'Edit',
     ];
@@ -93,81 +98,66 @@ class Wiki {
     return $html;
   }
 
-
-
-
-  ///// TODO BELOW
-
-
-
-
-  public function create(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
-    $params = (array)$request->getParsedBody();
-
-    if(empty($params['name'])) {
-      return $response
-        ->withHeader('Location', '/dashboard')
-        ->withStatus(302);
-    }
+  public function edit(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+    $params = $request->getQueryParams();
 
     $user = $request->getAttribute('user');
 
-    $todo = ORM::for_table('todos')->create();
-    $todo->user_id = $user->id;
-    $todo->org_id = $user->org_id;
-    $todo->name = $params['name'];
-    $todo->created_at = date('Y-m-d H:i:s');
-    $todo->save();
-
-    return $response
-      ->withHeader('Location', '/dashboard')
-      ->withStatus(302);
-  }
-
-  public function todo(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
-
-    $user = $request->getAttribute('user');
-
-    $todo = ORM::for_table('todos')
-      ->where('user_id', $user->id)
-      ->where('id', $args['id'])
+    $page = ORM::for_table('pages')
+      ->where('org_id', $user->org_id)
+      ->where('slug', $params['page'])
       ->find_one();
 
-    if(!$todo) {
-      return $response->withStatus(404);
+    if(!$page) {
+      $page = ORM::for_table('pages')->create();
     }
 
-    $meta = '<meta property="og:title" content="TODO"/>';
-    $meta = '<meta property="og:description" content="'.e($todo->name).'"/>';
+    $links[] = [
+      'url' => '/wiki/',
+      'name' => 'Home',
+    ];
 
-    return render($response, 'wiki/page', [
-      'meta' => $meta,
+    $links[] = [
+      'url' => '/wiki/'.urlencode($params['page']),
+      'name' => $params['page'],
+    ];
+
+    return render($response, 'wiki/edit', [
+      'page' => $page,
       'user' => $user,
-      'todo' => $todo,
+      'navlinks' => $links,
     ]);
   }
 
-  public function todo_json(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+  public function save(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+    $params = (array)$request->getParsedBody();
 
     $user = $request->getAttribute('user');
 
-    $todo = ORM::for_table('todos')
-      ->where('user_id', $user->id)
-      ->where('id', $args['id'])
+    $page = ORM::for_table('pages')
+      ->where('org_id', $user->org_id)
+      ->where('slug', $params['slug'])
       ->find_one();
 
-    if(!$todo) {
-      return $response->withStatus(404);
+    if(!$page) {
+      $page = ORM::for_table('pages')->create();
+      $page->org_id = $user->org_id;
+      $page->slug = $params['slug'];
+      $page->created_by = $user->id;
+      $page->created_at = date('Y-m-d H:i:s');
     }
 
-    $response->getBody()->write(json_encode([
-      'id' => $todo->id,
-      'name' => $todo->name,
-      'created_at' => $todo->created_at,
-      'completed_at' => $todo->completed_at,
-    ]));
-    return $response;
+    $page->last_updated_by = $user->id;
+    $page->updated_at = date('Y-m-d H:i:s');
+
+    $page->text = $params['text'];
+
+    $page->save();
+
+    return $response->withStatus(302)
+      ->withHeader('Location', '/wiki/'.urlencode($params['slug']));
   }
+
 
 }
 
