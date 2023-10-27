@@ -137,7 +137,7 @@ class OpenID {
     $_SESSION['user_id'] = $user->id;
 
     return $response
-      ->withHeader('Location', '/dashboard')
+      ->withHeader('Location', '/logged-in')
       ->withStatus(302);
   }
 

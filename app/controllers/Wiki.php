@@ -14,13 +14,17 @@ class Wiki {
     ]);
   }
 
-  public function dashboard(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
+  public function home(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
 
     $user = $request->getAttribute('user');
 
-    return render($response, 'wiki/dashboard', [
+    $html = 'hlelo';
+
+    // Load the home page or create if it doesn't exist
+
+    return render($response, 'wiki/page', [
+      'page_html' => $html,
       'user' => $user,
-      'todos' => $todos,
     ]);
   }
 

@@ -1,5 +1,5 @@
   <div class="px-4 py-5 my-5 text-center">
-    <h1 class="display-5 fw-bold text-body-emphasis">TODO</h1>
+    <h1 class="display-5 fw-bold text-body-emphasis"><?= e($_ENV['APP_NAME']) ?></h1>
 
     <div class="col-sm-4 mx-auto">
 

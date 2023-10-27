@@ -30,6 +30,7 @@ $app->group('', function(RouteCollectorProxy $group){
 
   switch($_ENV['SITE_TYPE']) {
     case 'todo':
+      $group->redirect('/logged-in', '/dashboard');
       $group->get('/dashboard', [Controllers\Todos::class, 'dashboard']);
       $group->get('/todo/{id}.json', [Controllers\Todos::class, 'todo_json']);
       $group->get('/todo/{id}_json', [Controllers\Todos::class, 'todo_json']);
@@ -38,7 +39,8 @@ $app->group('', function(RouteCollectorProxy $group){
       $group->post('/todos/edit', [Controllers\Todos::class, 'edit']);
       break;
     case 'wiki':
-      $group->get('/dashboard', [Controllers\Wiki::class, 'dashboard']);
+      $group->redirect('/logged-in', '/home');
+      $group->get('/home', [Controllers\Wiki::class, 'home']);
 
       break;
   }
