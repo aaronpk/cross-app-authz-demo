@@ -10,11 +10,11 @@ class Authenticated {
 
   public function __invoke(Request $request, RequestHandler $handler): Response {
 
-    if(!isset($_SESSION['user_id'])) {
-      return $this->_errorResponse();
+    $user = $this->_getUserFromSession();
+    if(!$user) {
+      $user = $this->_getUserFromAccessToken($request);
     }
 
-    $user = ORM::for_table('users')->where('id', $_SESSION['user_id'])->find_one();
     if(!$user) {
       return $this->_errorResponse();
     }
@@ -22,6 +22,58 @@ class Authenticated {
     $request = $request->withAttribute('user', $user);
 
     return $handler->handle($request);
+  }
+
+  private function _getUserFromSession() {
+    if(!isset($_SESSION['user_id'])) {
+      return false;
+    }
+
+    $user = ORM::for_table('users')
+      ->where('id', $_SESSION['user_id'])
+      ->find_one();
+
+    if(!$user) {
+      return false;
+    }
+
+    return $user;
+  }
+
+  private function _getUserFromAccessToken(Request &$request) {
+    $accessToken = $this->_getAccessTokenFromHeader();
+
+    if(!$accessToken) {
+      return false;
+    }
+
+    $tokenInfo = ORM::for_table('tokens')
+      ->where('token', $accessToken)
+      ->find_one();
+
+    if(!$tokenInfo) {
+      return false;
+    }
+
+    $scopes = explode(' ', ($tokenInfo['scope'] ?? ''));
+
+    $request = $request->withAttribute('scope', $scopes);
+
+    $user = ORM::for_table('users')
+      ->where('id', $tokenInfo['user_id'])
+      ->find_one();
+
+    return $user;
+  }
+
+  private function _getAccessTokenFromHeader() {
+    if(!isset($_SERVER['HTTP_AUTHORIZATION'])) {
+      return false;
+    }
+
+    $accessToken = explode(' ', $_SERVER['HTTP_AUTHORIZATION'])[1];
+
+    return $accessToken;
   }
 
   private function _errorResponse() {
