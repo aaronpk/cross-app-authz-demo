@@ -11,12 +11,17 @@ class Authenticated {
   public function __invoke(Request $request, RequestHandler $handler): Response {
 
     $user = $this->_getUserFromSession();
+
     if(!$user) {
       $user = $this->_getUserFromAccessToken($request);
     }
 
     if(!$user) {
-      return $this->_errorResponse();
+      if($request->hasHeader('Authorization')) {
+        return $this->_jsonUnauthorizedError();
+      } else {
+        return $this->_redirectToHomePage();
+      }
     }
 
     $request = $request->withAttribute('user', $user);
@@ -41,7 +46,7 @@ class Authenticated {
   }
 
   private function _getUserFromAccessToken(Request &$request) {
-    $accessToken = $this->_getAccessTokenFromHeader();
+    $accessToken = $this->_getAccessTokenFromHeader($request);
 
     if(!$accessToken) {
       return false;
@@ -66,17 +71,24 @@ class Authenticated {
     return $user;
   }
 
-  private function _getAccessTokenFromHeader() {
-    if(!isset($_SERVER['HTTP_AUTHORIZATION'])) {
+  private function _getAccessTokenFromHeader(Request $request) {
+    if(!$request->hasHeader('Authorization')) {
       return false;
     }
 
-    $accessToken = explode(' ', $_SERVER['HTTP_AUTHORIZATION'])[1];
+    $accessToken = explode(' ', $request->getHeaderLine('Authorization'))[1];
 
     return $accessToken;
   }
 
-  private function _errorResponse() {
+  private function _jsonUnauthorizedError() {
+    $response = new Response();
+    $error = json_encode(['error' => 'unauthorized']);
+    $response->getBody()->write($error);
+    return $response->withStatus(401);
+  }
+
+  private function _redirectToHomePage() {
     $response = new Response();
     return $response->withHeader('Location', '/')->withStatus(302);
   }
