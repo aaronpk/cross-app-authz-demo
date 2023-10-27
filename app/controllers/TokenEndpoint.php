@@ -24,6 +24,9 @@ class TokenEndpoint {
       case 'client_credentials':
         return $this->_clientCredentialsGrant($request);
 
+      case 'urn:ietf:params:oauth:grant-type:jwt-acdc':
+        return $this->_acdcGrant($request);
+
       default:
         return $this->_jsonError('invalid_request', 400);
     }
@@ -31,21 +34,82 @@ class TokenEndpoint {
   }
 
   private function _clientCredentialsGrant(Request &$request) {
+    // Require client authentication
     $client = $this->_getClient($request, true);
     if(!$client) {
       return $this->_jsonError('unauthorized');
     }
 
     $user = ORM::for_table('users')->where('id', $client->user_id)->find_one();
+    $org = ORM::for_table('orgs')->where('id', $user->org_id)->find_one();
 
-    $token = $this->_generateAccessToken($client, $user);
+    $token = $this->_generateAccessToken($client, $user, $org);
 
     return $this->_tokenResponse($token);
   }
 
-  private function _generateAccessToken($client, $user, $scope='') {
+  private function _acdcGrant(Request $request) {
+    // Require client authentication
+    $client = $this->_getClient($request, true);
+    if(!$client) {
+      return $this->_jsonError('unauthorized');
+    }
+
+    $params = (array)$request->getParsedBody();
+
+    if(!isset($params['acdc'])) {
+      return $this->_jsonError('invalid_grant', 400);
+    }
+
+    if(!preg_match('/(.+)\.(.+)\.(.+)/', $params['acdc'], $match)) {
+      return $this->_jsonError('invalid_grant', 400);
+    }
+    $headerComponent = $match[1];
+    $claimsComponent = $match[2];
+    $signature = $match[3];
+
+    // At this point we know which IdP to expect, so we can validate the JWT against the IdP's public key
+    // TODO: Validate JWT
+    // iss, exp, iat
+
+    $claims = json_decode(base64_urldecode($claimsComponent), true);
+
+    // Validate azp matches client authentication
+    if($claims['azp'] != $client->client_id) {
+      return $this->_jsonError('invalid_grant', 400, 'azp does not match client authentication');
+    }
+
+    // Validate aud matches this application's Client ID at the IdP
+    $org = ORM::for_table('orgs')
+      ->where('id', $client->org_id)
+      ->find_one();
+
+    if($claims['aud'] != $org->client_id) {
+      return $this->_jsonError('invalid_grant', 400, 'aud does not match client authentication');
+    }
+
+    // Look up user
+    // We should know about them already. What happens if not?
+    $user = ORM::for_table('users')
+      ->where('sub', $claims['sub'])
+      ->find_one();
+
+    if(!$user) {
+      return $this->_jsonError('invalid_grant', 400, 'The user identified by sub was not found');
+    }
+
+    $scope = implode(' ', $claims['scopes']);
+
+    // All validations succeeded, issue an access token
+    $accessToken = $this->_generateAccessToken($client, $user, $org, $scope);
+
+    return $this->_tokenResponse($accessToken);
+  }
+
+  private function _generateAccessToken($client, $user, $org, $scope='') {
     $token = ORM::for_table('tokens')->create();
     $token->user_id = $user->id;
+    $token->org_id = $org->id;
     $token->client_id = $client->id;
     $token->scope = $scope;
     $token->created_at = date('Y-m-d H:i:s');
@@ -114,9 +178,12 @@ class TokenEndpoint {
     return $response->withStatus(200);
   }
 
-  private function _jsonError($error, $code=401) {
+  private function _jsonError($error, $code=401, $description=null) {
     $response = new Response();
-    $error = json_encode(['error' => $error]);
+    $data = ['error' => $error];
+    if($description)
+      $data['error_description'] = $description;
+    $error = json_encode($data);
     $response->getBody()->write($error);
     return $response->withStatus($code);
   }

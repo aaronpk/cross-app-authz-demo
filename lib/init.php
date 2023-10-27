@@ -19,6 +19,15 @@ function base64_urlencode($string) {
   return rtrim(strtr(base64_encode($string), '+/', '-_'), '=');
 }
 
+function base64_urldecode($input) {
+  $remainder = \strlen($input) % 4;
+  if ($remainder) {
+      $padlen = 4 - $remainder;
+      $input .= \str_repeat('=', $padlen);
+  }
+  return \base64_decode(\strtr($input, '-_', '+/'));
+}
+
 function e($text) {
   return htmlspecialchars($text);
 }
