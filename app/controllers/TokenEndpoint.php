@@ -76,7 +76,7 @@ class TokenEndpoint {
 
     // TODO: Validate JWT signature by looking up public key of issuer
 
-    // TODO: Don't bother validating JWTs from issuers we don't know about.
+    // FUTURE: Don't bother validating JWTs from issuers we don't know about.
     // The issuer should always match an issuer in the orgs table.
 
     // Validate exp, iat
@@ -108,6 +108,10 @@ class TokenEndpoint {
     $user = ORM::for_table('users')
       ->where('sub', $claims['sub'])
       ->find_one();
+
+    if(!$user) {
+      // FUTURE: If there is an `email` claim, look up the user that way too
+    }
 
     if(!$user) {
       return $this->_jsonError('invalid_grant', 400, 'The user identified by sub was not found');
