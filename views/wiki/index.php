@@ -11,7 +11,7 @@
         <form action="/login" method="post" style="width: 100%">
 
           <div class="mb-3">
-            <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" value="mysterious.lizard@igbc.tv">
+            <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" value="">
           </div>
 
           <button type="submit" class="btn btn-primary">Log In</button>
