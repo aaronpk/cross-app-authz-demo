@@ -1,5 +1,7 @@
 <?php
 use Slim\Views\PhpRenderer;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..');
 $dotenv->load();
@@ -8,6 +10,15 @@ ORM::configure('mysql:host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_NAME'] 
 ORM::configure('username', $_ENV['DB_USER']);
 ORM::configure('password', $_ENV['DB_PASS']);
 ORM::configure('driver_options', array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'));
+
+function logger() {
+  static $logger;
+  if(!isset($logger)) {
+    $logger = new Logger('app');
+    $logger->pushHandler(new StreamHandler(__DIR__.'/../logs/app.log', Logger::DEBUG));
+  }
+  return $logger;
+}
 
 function render($response, $page, $data) {
   $renderer = new PhpRenderer(__DIR__.'/../views/');

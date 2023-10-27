@@ -5,7 +5,8 @@
     "slim/php-view": "^3.2",
     "slim/psr7": "^1.6",
     "guzzlehttp/guzzle": "^7.8",
-    "vlucas/phpdotenv": "^5.5"
+    "vlucas/phpdotenv": "^5.5",
+    "monolog/monolog": "^3.5"
   },
   "autoload": {
     "psr-4": {

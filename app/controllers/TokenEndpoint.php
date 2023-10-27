@@ -19,6 +19,8 @@ class TokenEndpoint {
       return $this->_jsonError('unauthorized');
     }
 
+    logger()->debug('Processing token request', ['grant_type' => $params['grant_type']]);
+
     switch($params['grant_type'] ?? '') {
 
       case 'client_credentials':
