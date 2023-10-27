@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/bootstrap-5.3.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="/bootstrap-5.3.2/css/bootstrap-responsive.min.css">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/<?= $_ENV['SITE_TYPE'] ?>.css">
 
   <script src="/js/jquery-3.7.1.min.js"></script>
   <script src="/js/script.js"></script>
