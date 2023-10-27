@@ -40,8 +40,10 @@ class TokenEndpoint {
       return $this->_jsonError('unauthorized');
     }
 
-    $user = ORM::for_table('users')->where('id', $client->user_id)->find_one();
-    $org = ORM::for_table('orgs')->where('id', $user->org_id)->find_one();
+    $user = null;
+    $org  = null;
+
+    // TODO: Accept user or org parameters if the user/org has already authorized this client
 
     $token = $this->_generateAccessToken($client, $user, $org);
 
@@ -68,24 +70,37 @@ class TokenEndpoint {
     $claimsComponent = $match[2];
     $signature = $match[3];
 
-    // At this point we know which IdP to expect, so we can validate the JWT against the IdP's public key
-    // TODO: Validate JWT
-    // iss, exp, iat
-
     $claims = json_decode(base64_urldecode($claimsComponent), true);
 
-    // Validate azp matches client authentication
+    // JWT signature is not yet verified
+
+    // TODO: Validate JWT signature by looking up public key of issuer
+
+    // TODO: Don't bother validating JWTs from issuers we don't know about.
+    // The issuer should always match an issuer in the orgs table.
+
+    // Validate exp, iat
+    if($claims['exp'] > time()) {
+      return $this->_jsonError('invalid_grant', 400, 'ACDC expired');
+    }
+
+    // azp (authorized party) - which client the ACDC was issued to by the IdP.
+    // azp is the client ID in the context of this application, mapping was done by the IdP.
+    // Validate azp matches client authentication.
     if($claims['azp'] != $client->client_id) {
       return $this->_jsonError('invalid_grant', 400, 'azp does not match client authentication');
     }
 
-    // Validate aud matches this application's Client ID at the IdP
+    // Tenancy is established by the iss + client_id pair in the orgs table
+
+    // Look up the org by the iss + aud of the token
     $org = ORM::for_table('orgs')
-      ->where('id', $client->org_id)
+      ->where('issuer', $claims['iss'])
+      ->where('client_id', $claims['aud'])
       ->find_one();
 
-    if($claims['aud'] != $org->client_id) {
-      return $this->_jsonError('invalid_grant', 400, 'aud does not match client authentication');
+    if(!$org) {
+      return $this->_jsonError('invalid_grant', 400, 'Unknown tenant');
     }
 
     // Look up user
@@ -109,7 +124,6 @@ class TokenEndpoint {
   private function _generateAccessToken($client, $user, $org, $scope='') {
     $token = ORM::for_table('tokens')->create();
     $token->user_id = $user->id;
-    $token->org_id = $org->id;
     $token->client_id = $client->id;
     $token->scope = $scope;
     $token->created_at = date('Y-m-d H:i:s');
