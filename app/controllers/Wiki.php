@@ -4,6 +4,7 @@ namespace App\Controllers;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ORM;
+use League\CommonMark\CommonMarkConverter;
 
 class Wiki {
 
@@ -51,9 +52,9 @@ class Wiki {
       ->find_one();
 
     if(!$page) {
+      // TODO: Show empty page editor
       return $response->withStatus(404);
     }
-
 
     $html = $this->_renderWikiHTML($page);
 
@@ -65,7 +66,26 @@ class Wiki {
 
   private function _renderWikiHTML(&$page) {
 
-    $html = htmlspecialchars($page->text);
+    $converter = new CommonMarkConverter([
+      'html_input' => 'strip',
+      'allow_unsafe_links' => false,
+    ]);
+
+    $text = $page->text;
+
+    logger()->debug($text);
+
+    // Preprocess
+
+    // Convert wiki links to HTML links
+    $text = preg_replace_callback('/\[\[(.+?)\]\]/', function($matches) {
+      $name = $matches[1];
+      return '['.$name.']('.$_ENV['BASE_URL'].'wiki/'.urlencode($name).')';
+    }, $text);
+
+    logger()->debug($text);
+
+    $html = $converter->convert($text);
 
     return $html;
   }

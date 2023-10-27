@@ -6,7 +6,8 @@
     "slim/psr7": "^1.6",
     "guzzlehttp/guzzle": "^7.8",
     "vlucas/phpdotenv": "^5.5",
-    "monolog/monolog": "^3.5"
+    "monolog/monolog": "^3.5",
+    "league/commonmark": "^2.4"
   },
   "autoload": {
     "psr-4": {
