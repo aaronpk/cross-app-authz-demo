@@ -110,6 +110,7 @@ class Wiki {
 
     if(!$page) {
       $page = ORM::for_table('pages')->create();
+      $page->slug = $params['page'];
     }
 
     $links[] = [

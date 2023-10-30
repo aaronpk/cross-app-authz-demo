@@ -40,5 +40,5 @@ function base64_urldecode($input) {
 }
 
 function e($text) {
-  return htmlspecialchars($text);
+  return htmlspecialchars($text ?? '');
 }
