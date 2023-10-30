@@ -57,10 +57,20 @@ CREATE TABLE `tokens` (
 
 CREATE TABLE `clients` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
   `client_id` varchar(255) DEFAULT NULL,
   `client_secret` varchar(255) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `org_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `external_tokens` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `app_name` varchar(255) NOT NULL,
+  `access_token` longtext DEFAULT NULL,
+  `expires_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
