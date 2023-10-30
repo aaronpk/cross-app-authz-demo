@@ -8,6 +8,8 @@ use League\CommonMark\CommonMarkConverter;
 
 class Wiki {
 
+  private $_user;
+
   public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
 
     return render($response, 'wiki/index', [
@@ -47,7 +49,7 @@ class Wiki {
 
   public function page(ServerRequestInterface $request, ResponseInterface $response, $params): ResponseInterface {
 
-    $user = $request->getAttribute('user');
+    $this->_user = $user = $request->getAttribute('user');
 
     $page = ORM::for_table('pages')
       ->where('org_id', $user->org_id)
@@ -82,7 +84,7 @@ class Wiki {
 
     $text = $page->text;
 
-    // Convert wiki links to HTML links
+    // Convert wiki links to Markdown links
     $text = preg_replace_callback('/\[\[(.+?)\]\]/', function($matches) {
       $name = $matches[1];
       return '['.$name.']('.$_ENV['BASE_URL'].'wiki/'.urlencode($name).')';
@@ -94,6 +96,26 @@ class Wiki {
     ]);
 
     $html = $converter->convert($text);
+
+    // Replace recognized site links with chips
+    $todo = new \App\Chips\Todo($this->_user);
+    $matches = $todo->matches($html);
+    $hashmap = [];
+    while(count($matches) > 0) {
+      // Grab the first match
+      $match = $matches[1][0]; 
+      // Replace the URL with a hash, and add to the map
+      $url = $match[0];
+      $hash = md5($url);
+      $hashmap[$hash] = $url;
+      $html = substr_replace($html, $hash, $match[1], strlen($url));
+      $matches = $todo->matches($html);
+    }
+
+    // Go through and replace all the hashes with the expanded HTML
+    foreach($hashmap as $hash=>$url) {
+      $html = str_replace($hash, $todo->chipHTML($url), $html);
+    }
 
     return $html;
   }
@@ -152,6 +174,10 @@ class Wiki {
     $page->updated_at = date('Y-m-d H:i:s');
 
     $page->text = $params['text'];
+
+    // Look for any matching links to supported apps and fetch content to expand
+    $todo = new \App\Chips\Todo($user);
+    $todo->saveExpandedLinks($page->text);
 
     $page->save();
 

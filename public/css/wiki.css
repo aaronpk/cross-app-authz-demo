@@ -2,3 +2,22 @@ nav.navbar {
   background-color: #808 !important;
 }
 
+.chip {
+  font-size: 0.9em;
+}
+.chip a {
+  display: inline-block;
+  border: 1px #ccc solid;
+  border-radius: 4px;
+  padding: 2px 6px;
+  text-decoration: none;
+  color: #0052cc;
+}
+.chip a:hover {
+  border-color: #0052cc;
+}
+.chip img {
+  width: 16px;
+  vertical-align: middle;
+  margin-bottom: 3px;
+}
