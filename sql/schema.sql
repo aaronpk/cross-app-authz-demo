@@ -24,7 +24,6 @@ CREATE TABLE `pages` (
   `org_id` int(11) NOT NULL,
   `slug` varchar(255) NOT NULL,
   `text` longtext DEFAULT NULL,
-  `expansions` longtext DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `last_updated_by` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
@@ -65,3 +64,11 @@ CREATE TABLE `clients` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE `link_expansions` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `url` varchar(255) NOT NULL,
+  `data` longtext DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
