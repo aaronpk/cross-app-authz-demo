@@ -44,6 +44,7 @@ class OpenID {
       'state' => $_SESSION['state'],
       'code_challenge' => $code_challenge,
       'code_challenge_method' => 'S256',
+      'login_hint' => $email,
     ]);
 
     return $response

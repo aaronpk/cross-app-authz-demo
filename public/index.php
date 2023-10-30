@@ -6,6 +6,7 @@ use Slim\Routing\RouteCollectorProxy;
 use App\Controllers;
 use App\Middleware;
 
+session_set_cookie_params(86400*30);
 session_start();
 
 $app = AppFactory::create();
