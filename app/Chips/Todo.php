@@ -12,9 +12,6 @@ class Todo extends \App\Chips {
     'CLIENT_SECRET',
   ];
 
-  private $_config;
-  private $_user;
-
   public function __construct(&$user) {
     foreach(self::$configItems as $item) {
       $this->_config[$item] = $_ENV[self::$configPrefix.'_'.$item];
@@ -49,7 +46,7 @@ class Todo extends \App\Chips {
         $offset = $m[1];
 
         // Get a cached token or fetch via ACDC grant
-        $token = $this->getTokenForUser($this->_user);
+        $token = $this->getTokenForUser();
 
         if($token) {
           // Fetch the object

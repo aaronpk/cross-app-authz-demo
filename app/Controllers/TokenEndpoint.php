@@ -82,7 +82,7 @@ class TokenEndpoint {
     // The issuer should always match an issuer in the orgs table.
 
     // Validate exp, iat
-    if($claims['exp'] > time()) {
+    if($claims['exp'] < time()) {
       return $this->_jsonError('invalid_grant', 400, 'ACDC expired');
     }
 
@@ -90,19 +90,19 @@ class TokenEndpoint {
     // azp is the client ID in the context of this application, mapping was done by the IdP.
     // Validate azp matches client authentication.
     if($claims['azp'] != $client->client_id) {
-      return $this->_jsonError('invalid_grant', 400, 'azp does not match client authentication');
+      return $this->_jsonError('invalid_grant', 400, 'azp ('.$claims['azp'].') does not match client authentication ('.$client->client_id.')');
     }
 
     // Tenancy is established by the iss + client_id pair in the orgs table
 
-    // Look up the org by the iss + aud of the token
+    // Look up the org by the iss of the token
     $org = ORM::for_table('orgs')
       ->where('issuer', $claims['iss'])
       ->where('client_id', $claims['aud'])
       ->find_one();
 
     if(!$org) {
-      return $this->_jsonError('invalid_grant', 400, 'Unknown tenant');
+      return $this->_jsonError('invalid_grant', 400, 'Unknown tenant: '.$claims['iss'].' aud='.$claims['aud']);
     }
 
     // Look up user
@@ -116,7 +116,7 @@ class TokenEndpoint {
     }
 
     if(!$user) {
-      return $this->_jsonError('invalid_grant', 400, 'The user identified by sub was not found');
+      return $this->_jsonError('invalid_grant', 400, 'The user identified by sub ('.$claims['sub'].') was not found');
     }
 
     $scope = implode(' ', $claims['scopes']);
