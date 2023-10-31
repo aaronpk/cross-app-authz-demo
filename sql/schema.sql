@@ -39,6 +39,8 @@ CREATE TABLE `users` (
   `name` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `last_login` datetime DEFAULT NULL,
+  `id_token` longtext DEFAULT NULL,
+  `saml_assertion` longtext DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `org_sub` (`org_id`,`sub`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

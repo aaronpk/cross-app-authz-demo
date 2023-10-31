@@ -133,6 +133,7 @@ class OpenID {
     $user->name = $userinfo['name'] ?? '';
     $user->email = $userinfo['email'] ?? '';
     $user->last_login = date('Y-m-d H:i:s');
+    $user->id_token = $id_token;
     $user->save();
 
     $_SESSION['user_id'] = $user->id;
