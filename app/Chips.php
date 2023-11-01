@@ -33,7 +33,7 @@ abstract class Chips {
     ]);
 
     // Exchange the ID Token for an ACDC code 
-    /*
+
     try {
       $params = [
         'grant_type' => 'urn:ietf:params:oauth:grant-type:token-exchange',
@@ -45,10 +45,10 @@ abstract class Chips {
         'client_id' => $org->client_id,
         'client_secret' => $org->client_secret,
       ];
-      print_r($params);
       $response = $client->request('POST', $org->token_endpoint, [
         'form_params' => $params
       ]);
+      $body = (string)$response->getBody();
     } catch(\GuzzleHttp\Exception\TransferException $e) {
       if($e->hasResponse()) {
         $body = (string)$e->getResponse()->getBody();
@@ -56,27 +56,29 @@ abstract class Chips {
       }      
     }
 
-    $body = (string)$response->getBody();
     $info = json_decode($body, true);
-    */
+    $info['raw_response'] = $body;
+
 
     // Fake an ACDC
+    // $acdc = base64_urlencode(json_encode(['typ'=>'acdc+jwt']))
+    //   .'.'.base64_urlencode(json_encode([
+    //     'iss' => $org->issuer,
+    //     'sub' => $user->sub,
+    //     'aud' => '0oad0ulqgzalQFzI45d7',
+    //     'azp' => $this->_config['CLIENT_ID'],
+    //     'exp' => time()+600,
+    //     'iat' => time(),
+    //     'scopes' => [],
+    //   ])).'.'.base64_urlencode('signature');
 
-    $acdc = base64_urlencode(json_encode(['typ'=>'acdc+jwt']))
-      .'.'.base64_urlencode(json_encode([
-        'iss' => $org->issuer,
-        'sub' => $user->sub,
-        'aud' => '0oad0ulqgzalQFzI45d7',
-        'azp' => $this->_config['CLIENT_ID'],
-        'exp' => time()+600,
-        'iat' => time(),
-        'scopes' => [],
-      ])).'.'.base64_urlencode('signature');
+    // $info = [
+    //   'acdc' => $acdc,
+    //   'token_type' => 'urn:ietf:params:oauth:token-type:jwt-acdc',
+    // ];
 
-    $info = [
-      'acdc' => $acdc,
-      'token_type' => 'urn:ietf:params:oauth:token-type:jwt-acdc',
-    ];
+    // $info['raw_response'] = json_encode($info);
+
 
     return $info;
   }
@@ -91,33 +93,26 @@ abstract class Chips {
       'timeout' => 10
     ]);
 
-
     try {
       $params = [
         'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-acdc',
-        'acdc' => $acdc['acdc'],
+        'acdc' => $acdc,
         'client_id' => $this->_config['CLIENT_ID'],
         'client_secret' => $this->_config['CLIENT_SECRET'],
       ];
       $response = $client->request('POST', $this->_config['TOKEN_ENDPOINT'], [
         'form_params' => $params
       ]);
+      $body = (string)$response->getBody();
     } catch(\GuzzleHttp\Exception\TransferException $e) {
-      echo "Error requesting token\n";
       if($e->hasResponse()) {
         $body = (string)$e->getResponse()->getBody();
         $details = json_decode($body, true);
-        if($details)
-          print_r($details);
-        else
-          echo $body."\n\n";
       }
-      return;
     }
 
-    $body = (string)$response->getBody();
-    echo $body."\n\n";
     $info = json_decode($body, true);
+    $info['raw_response'] = $body;
 
     return $info;
   }

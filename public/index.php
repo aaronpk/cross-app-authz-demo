@@ -40,11 +40,14 @@ $app->group('', function(RouteCollectorProxy $group){
       $group->post('/todos/edit', [Controllers\Todos::class, 'edit']);
       break;
     case 'wiki':
-      $group->redirect('/logged-in', '/wiki/');
       $group->get('/wiki/', [Controllers\Wiki::class, 'home']);
       $group->get('/wiki/{page}', [Controllers\Wiki::class, 'page']);
       $group->get('/edit', [Controllers\Wiki::class, 'edit']);
       $group->post('/edit/save', [Controllers\Wiki::class, 'save']);
+
+      $group->redirect('/logged-in', '/oauth/acdc');
+      $group->get('/oauth/acdc', [Controllers\ACDC::class, 'get']);
+      $group->post('/oauth/acdc', [Controllers\ACDC::class, 'post']);
 
       break;
   }

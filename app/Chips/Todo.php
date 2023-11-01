@@ -20,6 +20,13 @@ class Todo extends \App\Chips {
     $this->_user = $user;
   }
 
+  public function __get($key) {
+    if(isset($this->_config[strtoupper($key)])) {
+      return $this->_config[strtoupper($key)];
+    }
+    return null;
+  }
+
   public function regex() {
     return '/(https:\/\/'.str_replace('.', '\.', $this->_config['HOSTNAME']).'\/todo\/(\d+))[^0-9]/';
   }

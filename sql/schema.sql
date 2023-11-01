@@ -73,6 +73,7 @@ CREATE TABLE `external_tokens` (
   `app_name` varchar(255) NOT NULL,
   `access_token` longtext DEFAULT NULL,
   `expires_at` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

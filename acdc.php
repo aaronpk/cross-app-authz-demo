@@ -22,10 +22,21 @@ foreach($users as $user) {
 
     echo "Requesting Token...\n";
 
-    $token = $todo->requestTokenWithACDC($acdc);
+    $token = $todo->requestTokenWithACDC($acdc['acdc']);
 
     echo "Got token from Todo app\n";
     print_r($token);
+
+    if(isset($token['access_token'])) {
+      $externalToken = ORM::for_table('external_tokens')->create();
+      $externalToken->user_id = $user->id;
+      $externalToken->app_name = 'Todo';
+      $externalToken->access_token = $token['access_token'];
+      if(isset($token['expires_in'])) {
+        $externalToken['expires_at'] = date('Y-m-d H:i:s', time()+$token['expires_in']);
+      }
+      $externalToken->save();
+    }
 
   }
 
