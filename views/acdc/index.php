@@ -3,6 +3,11 @@
   <div class="col-sm-4 mx-auto">
 
     <p>
+      <b>Got an ID Token from the IdP</b><br>
+      <textarea readonly style="width: 100%; height: 150px; font-family: courier"><?= $user->id_token ?></textarea>
+    </p>
+
+    <p>
       <b>Exchanging ID Token for cross-domain code...</b><br>
       Posting to <code><?= $org->token_endpoint ?></code>
     </p>

@@ -17,6 +17,7 @@ class ACDC {
     $todo = new \App\Chips\Todo($user);
 
     return render($response, 'acdc/index', [
+      'user' => $user,
       'org' => $org,
       'todo_token_endpoint' => $todo->token_endpoint,
     ]);
