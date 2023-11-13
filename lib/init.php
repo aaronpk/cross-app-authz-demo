@@ -3,7 +3,7 @@ use Slim\Views\PhpRenderer;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/..', $_ENV['ENV']);
 $dotenv->load();
 
 ORM::configure('mysql:host=' . $_ENV['DB_HOST'] . ';dbname=' . $_ENV['DB_NAME'] . ';charset=utf8mb4');

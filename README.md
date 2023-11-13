@@ -7,27 +7,39 @@ Note: This application does not use production-grade security mechanisms and sho
 
 ## Getting Started
 
+### Dependencies
+
+* [MariaDB](https://mariadb.org)
+* [PHP 8.2](https://php.net/)
+* [Composer](https://getcomposer.org)
+
 ### Initial Setup
 
-* Copy `.env.example` to `.env` and fill out the details
-    * Choose whether you are running this as the Requesting Application (wiki) or Resource Application (todo)
 * Set up MySQL, create a database, and grant a user permissions to the database
-    * `CREATE DATABASE demo; GRANT ALL PRIVILEGES ON demo.* TO 'demo'@'127.0.0.1' IDENTIFIED BY 'demo';`
-* Create the database tables by running the SQL code in `sql/schama.sql`
+    * `CREATE DATABASE todo_app; GRANT ALL PRIVILEGES ON todo_app.* TO 'todo_app'@'127.0.0.1' IDENTIFIED BY 'todo_app';`
+    * `CREATE DATABASE wiki_app; GRANT ALL PRIVILEGES ON wiki_app.* TO 'wiki_app'@'127.0.0.1' IDENTIFIED BY 'wiki_app';`
+* Copy `.todo.env.example` to `.todo.env`
+* Copy `.wiki.env.example` to `.wiki.env`
+* Create the database tables in both databases by running the SQL code in `sql/schema.sql`
+* Install the dependencies: `composer install`
 * Start the app with the built-in PHP server
-    * `php -S 127.0.0.1:8080 -t public`
+    * `./todo.sh`
+    * `./wiki.sh`
 
 Note: The built-in PHP server will think that URLs ending in `.json` are files and won't route them to the application. If you are trying to fetch a URL like `http://localhost:8080/todo/1.json`, there is an additional route for that at `http://localhost:8080/todo/1_json`.
 
 ### Identity Provider Configuration
 
-* Create an application at the IdP for the todo app or wiki app
+* Create an application at the IdP for the todo app and the wiki app
 * Add a record to the `orgs` table with the IdP config and client ID and secret
     * You'll also need to set the email domain for IdP discovery. If you enter `example.com` in the `domain` column, then you'll be routed to that org's IdP when you enter `user@example.com` in the login box.
+* Use the redirect URI for each app:
+    * Todo: `http://localhost:7070/openid/callback/1`
+    * Wiki: `http://localhost:8080/openid/callback/1`
 
 ### Resource Application Configuration
 
-When running the resource application, you'll need to have a client registered for the Requesting Application. Create an entry in the `clients` table generating a random client ID and secret (leave user_id and org_id blank).
+When running the resource application, you'll need to have a client registered for the Requesting Application. Create an entry in the `clients` table generating a random client ID and secret (leave `user_id` and `org_id` blank).
 
 ## Usage
 
