@@ -12,8 +12,20 @@ class Wiki {
 
   public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
 
-    return render($response, 'wiki/index', [
+    $this->_user = $user = $request->getAttribute('user');
 
+    $links = [];
+
+    if($this->_user) {
+      $links[] = [
+        'url' => '/wiki/',
+        'name' => 'Home',
+      ];
+    }
+
+    return render($response, 'wiki/index', [
+      'user' => $this->_user,
+      'navlinks' => $links,
     ]);
   }
 

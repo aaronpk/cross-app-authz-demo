@@ -18,14 +18,16 @@ $app->get('/openid/callback/{id}', [Controllers\OpenID::class, 'redirect']);
 $app->post('/oauth/token', [Controllers\TokenEndpoint::class, 'token']);
 
 
-switch($_ENV['SITE_TYPE']) {
-  case 'todo':
-    $app->get('/', [Controllers\Todos::class, 'index']);
-    break;
-  case 'wiki':
-    $app->get('/', [Controllers\Wiki::class, 'index']);
-    break;
-}
+$app->group('', function(RouteCollectorProxy $group){
+  switch($_ENV['SITE_TYPE']) {
+    case 'todo':
+      $group->get('/', [Controllers\Todos::class, 'index']);
+      break;
+    case 'wiki':
+      $group->get('/', [Controllers\Wiki::class, 'index']);
+      break;
+  }
+})->add(Middleware\AuthenticatedIfAvailable::class);
 
 $app->group('', function(RouteCollectorProxy $group){
 

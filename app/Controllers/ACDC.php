@@ -16,10 +16,17 @@ class ACDC {
 
     $todo = new \App\Chips\Todo($user);
 
+    $links = [];
+    $links[] = [
+      'url' => '/wiki/',
+      'name' => 'Home',
+    ];      
+
     return render($response, 'acdc/index', [
       'user' => $user,
       'org' => $org,
       'todo_token_endpoint' => $todo->token_endpoint,
+      'navlinks' => $links,
     ]);
   }
 
