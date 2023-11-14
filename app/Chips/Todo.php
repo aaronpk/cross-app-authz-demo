@@ -10,6 +10,7 @@ class Todo extends \App\Chips {
     'TOKEN_ENDPOINT',
     'CLIENT_ID',
     'CLIENT_SECRET',
+    'SCOPES',
   ];
 
   public function __construct(&$user) {

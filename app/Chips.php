@@ -39,7 +39,7 @@ abstract class Chips {
       'requested_token_type' => 'urn:ietf:params:oauth:grant-type:jwt-acdc',
       'resource' => $this->_config['TOKEN_ENDPOINT'],
       'audience' => $this->_config['CLIENT_ID'],
-      'scope' => '',
+      'scope' => $this->_config['SCOPES'],
       'subject_token_type' => 'urn:ietf:params:oauth:token-type:id_token',
       'subject_token' => $user->id_token,
       'client_id' => $org->client_id,
