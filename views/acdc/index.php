@@ -10,6 +10,10 @@
     <p>
       <b>Exchanging ID Token for cross-domain code...</b><br>
       Posting to <code><?= $org->token_endpoint ?></code>
+      <details>
+        <summary>Params</summary>
+        <pre id="acdc-params" class="response"></pre>
+      </details>
     </p>
 
     <p>Raw response from IDP:</p>
@@ -43,7 +47,9 @@ $(function(){
     step: 'acdc',
   }, function(response){
 
+    $("#acdc-params").text(response.acdc_params);
     $("#acdc-response").text(response.text);
+
     if(response.response.acdc) {
       $(".step-2.success").removeClass("hidden");
 

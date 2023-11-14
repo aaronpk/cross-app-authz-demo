@@ -34,18 +34,19 @@ abstract class Chips {
 
     // Exchange the ID Token for an ACDC code 
 
+    $params = [
+      'grant_type' => 'urn:ietf:params:oauth:grant-type:token-exchange',
+      'requested_token_type' => 'urn:ietf:params:oauth:grant-type:jwt-acdc',
+      'resource' => $this->_config['TOKEN_ENDPOINT'],
+      'audience' => $this->_config['CLIENT_ID'],
+      'scope' => '',
+      'subject_token_type' => 'urn:ietf:params:oauth:token-type:id_token',
+      'subject_token' => $user->id_token,
+      'client_id' => $org->client_id,
+      'client_secret' => $org->client_secret,
+    ];
+
     try {
-      $params = [
-        'grant_type' => 'urn:ietf:params:oauth:grant-type:token-exchange',
-        'requested_token_type' => 'urn:ietf:params:oauth:grant-type:jwt-acdc',
-        'resource' => $this->_config['TOKEN_ENDPOINT'],
-        'audience' => $this->_config['CLIENT_ID'],
-        'scope' => '',
-        'subject_token_type' => 'urn:ietf:params:oauth:token-type:id_token',
-        'subject_token' => $user->id_token,
-        'client_id' => $org->client_id,
-        'client_secret' => $org->client_secret,
-      ];
       $response = $client->request('POST', $org->token_endpoint, [
         'form_params' => $params
       ]);
@@ -58,6 +59,7 @@ abstract class Chips {
     }
 
     $info = json_decode($body, true);
+    $info['acdc_params'] = $params;
     $info['raw_response'] = $body;
 
 

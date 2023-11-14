@@ -42,8 +42,14 @@ class ACDC {
         $acdc = $todo->requestACDCWithIDToken($user->id_token);
         $text = $acdc['raw_response'];
 
+        $acdcParams = '';
+        foreach($acdc['acdc_params'] as $k=>$v) {
+          $acdcParams .= "$k=$v\n\n";
+        }
+
         $response = $response->withHeader('Content-type', 'application/json');
         $response->getBody()->write(json_encode([
+          'acdc_params' => $acdcParams,
           'text' => $text,
           'response' => $acdc,
         ]));
