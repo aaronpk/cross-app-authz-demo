@@ -7,10 +7,24 @@ use ORM;
 
 class Todos {
 
+  private $_user;
+
   public function index(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
 
-    return render($response, 'todo/index', [
+    $this->_user = $request->getAttribute('user');
 
+    $links = [];
+
+    if($this->_user) {
+      $links[] = [
+        'url' => '/todo/dashboard',
+        'name' => 'Home',
+      ];
+    }
+
+    return render($response, 'todo/index', [
+      'user' => $this->_user,
+      'navlinks' => $links,
     ]);
   }
 
