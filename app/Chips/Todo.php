@@ -47,11 +47,15 @@ class Todo extends \App\Chips {
   public function saveExpandedLinks($text) {
     $matches = $this->matches($text);
 
+    logger()->debug('Found '.count($matches).' Todo URLs to replace');
+
     if(count($matches)) {
       foreach($matches[1] as $i=>$m) {
         $todoId = $matches[2][$i][0];
         $url = $m[0];
         $offset = $m[1];
+
+        logger()->debug('Fetching Todo ID: '.$todoId.' from URL: '.$url);
 
         // Get a cached token or fetch via ACDC grant
         $token = $this->getTokenForUser();
@@ -60,7 +64,10 @@ class Todo extends \App\Chips {
           // Fetch the object
           $guzzle = new \GuzzleHttp\Client;
           try {
-            $response = $guzzle->request('GET', $this->urlForTodo($todoId), [
+            $todoURL = $this->urlForTodo($todoId);
+            logger()->debug('Fetching URL: '.$todoURL.' with access token: '.$token->access_token);
+
+            $response = $guzzle->request('GET', $todoURL, [
               'headers' => [
                 'Authorization' => 'Bearer '.$token->access_token,
               ]
