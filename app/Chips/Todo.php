@@ -29,7 +29,7 @@ class Todo extends \App\Chips {
   }
 
   public function regex() {
-    return '/(https:\/\/'.str_replace('.', '\.', $this->_config['HOSTNAME']).'\/todo\/(\d+))[^0-9]/';
+    return '/(https?:\/\/'.str_replace('.', '\.', $this->_config['HOSTNAME']).'\/todo\/(\d+))[^0-9]/';
   }
 
   public function matches($text) {
@@ -41,7 +41,7 @@ class Todo extends \App\Chips {
   }
 
   public function urlForTodo($id) {
-    return 'https://'.$this->_config['HOSTNAME'].'/todo/'.$id.'.json';
+    return 'http://'.$this->_config['HOSTNAME'].'/todo/'.$id.'.json';
   }
 
   public function saveExpandedLinks($text) {
