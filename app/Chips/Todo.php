@@ -29,7 +29,7 @@ class Todo extends \App\Chips {
   }
 
   public function regex() {
-    return '/(https?:\/\/'.str_replace('.', '\.', $this->_config['HOSTNAME']).'\/todo\/(\d+))[^0-9]/';
+    return '/(https?:\/\/'.str_replace('.', '\.', $this->_config['HOSTNAME']).'\/todo\/(\d+))/';
   }
 
   public function matches($text) {
