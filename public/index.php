@@ -6,7 +6,11 @@ use Slim\Routing\RouteCollectorProxy;
 use App\Controllers;
 use App\Middleware;
 
-session_set_cookie_params(86400*30);
+session_set_cookie_params([
+  'lifetime' => 86400*30,
+  'samesite' => 'Lax',
+]);
+session_name('SESSION_'.$_ENV['SITE_TYPE']);
 session_start();
 
 $app = AppFactory::create();
