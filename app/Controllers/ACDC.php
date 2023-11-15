@@ -60,8 +60,14 @@ class ACDC {
         $token = $todo->requestTokenWithACDC($params['acdc']);
         $text = $token['raw_response'];
 
+        $tokenRequestParams = '';
+        foreach($token['request_params'] as $k=>$v) {
+          $tokenRequestParams .= "$k=$v\n\n";
+        }
+
         $response = $response->withHeader('Content-type', 'application/json');
         $response->getBody()->write(json_encode([
+          'token_request_params' => $tokenRequestParams,
           'text' => $text,
           'response' => $token,
         ]));

@@ -115,6 +115,7 @@ abstract class Chips {
     }
 
     $info = json_decode($body, true);
+    $info['request_params'] = $params;
     $info['raw_response'] = $body;
 
     return $info;

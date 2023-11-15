@@ -2,40 +2,74 @@
 
   <div class="col-sm-4 mx-auto">
 
-    <p>
-      <b>Got an ID Token from the IdP</b><br>
-      <textarea readonly style="width: 100%; height: 150px; font-family: courier"><?= $user->id_token ?></textarea>
-    </p>
+    <h2>Hello, <?= $user->name ?>!</h2>
+    <p>You successfully signed in via <code><?= $org->issuer ?></code></p>
 
-    <p>
-      <b>Exchanging ID Token for cross-domain code...</b><br>
+    <details>
+      <summary><b>ID Token from the IdP</b></summary>
+      <textarea readonly style="width: 100%; height: 150px; font-family: courier"><?= $user->id_token ?></textarea>
+    </details>
+
+    <br>
+
+    <button id="do-acdc-request" class="btn btn-primary">Request ACDC</button>
+
+    <div id="acdc-request" class="hidden">
+      Requesting ACDC using ID Token...<br>
       Posting to <code><?= $org->token_endpoint ?></code>
+
       <details>
         <summary>Params</summary>
         <pre id="acdc-params" class="response"></pre>
       </details>
-    </p>
 
-    <p>Raw response from IDP:</p>
-    <pre id="acdc-response" class="response"></pre>
-
-
-    <div class="step-2 success hidden">
-      <p>
-        <b>Exchanging cross-domain code for access token...</b><br>
-        Posting to <code><?= $todo_token_endpoint ?></code>
-      </p>
-
-      <p>Raw response from Resource App:</p>
-      <pre id="token-response" class="response"></pre>
     </div>
 
-    <div class="step-2 error hidden">
-      <p><b>Error getting cross-domain code</b></p>
+    <div id="acdc-response" class="hidden">
+
+      <details>
+        <summary>Raw response from IdP:</summary>
+        <pre id="acdc-response-body" class="response"></pre>
+      </details>
+
+      <div class="success hidden">
+        <p><b>Successfully got an ACDC!</b></p>
+
+        <button id="do-token-request" class="btn btn-primary">Request Access Token</button>
+      </div>
+
+      <div class="error hidden">
+        <p><b>Error getting cross-domain code</b></p>
+      </div>
+
     </div>
 
-    <div class="step-3 success hidden">
-      <a href="/wiki/" class="btn btn-primary">Continue</a>
+
+    <div id="token-request" class="hidden">
+
+      Requesting Access Token using ACDC...<br>
+      Posting to <code><?= $todo_token_endpoint ?></code>
+
+      <details>
+        <summary>Params</summary>
+        <pre id="token-request-params" class="response"></pre>
+      </details>
+
+      <details>
+        <summary>Raw response from Token Endpoint:</summary>
+        <pre id="token-response-body" class="response"></pre>
+      </details>
+
+      <div class="success hidden">
+        <p><b>Successfully got an access token!</b></p>
+
+        <a href="/wiki/" class="btn btn-primary">Continue</a>
+      </div>
+
+      <div class="error hidden">
+        <p><b>Error getting access token</b></p>
+      </div>
+
     </div>
 
   </div>
@@ -43,34 +77,56 @@
 <script>
 $(function(){
 
-  $.post("/oauth/acdc", {
-    step: 'acdc',
-  }, function(response){
+  var acdc_response;
 
-    $("#acdc-params").text(response.acdc_params);
-    $("#acdc-response").text(response.text);
+  $("#do-acdc-request").click(function(){
 
-    if(response.response.acdc) {
-      $(".step-2.success").removeClass("hidden");
+    $("#acdc-request").removeClass("hidden");
+
+    $.post("/oauth/acdc", {
+      step: 'acdc',
+    }, function(response){
+
+      acdc_response = response;
+
+      $("#acdc-response").removeClass("hidden");
+      $("#acdc-params").text(response.acdc_params);
+      $("#acdc-response-body").text(response.text);
+
+      if(response.response.acdc) {
+        $("#acdc-response .success").removeClass("hidden");
+      } else {
+        $("#acdc-response .error").removeClass("hidden");
+        $("#acdc-response-body").parents()[0].setAttribute("open", true);
+      }
+
+    });
+
+  });
+
+  $("#do-token-request").click(function(){
+
+    $("#token-request").removeClass("hidden");
 
       $.post("/oauth/acdc", {
         step: 'token',
-        acdc: response.response.acdc,
+        acdc: acdc_response.response.acdc,
       }, function (response){
 
-        $("#token-response").text(response.text);
+        $("#token-request-params").text(response.token_request_params);
+
+        $("#token-response-body").text(response.text);
+        $("#token-response-body").parents()[0].setAttribute("open", true);
+
         if(response.response.access_token) {
-          $(".step-3.success").removeClass("hidden");
+          $("#token-request .success").removeClass("hidden");
+        } else {
+          $("#token-request .error").removeClass("hidden");
         }
 
       });
 
-    } else {
-      $(".step-2.error").removeClass("hidden");
-    }
-
   });
-
 
 });
 </script>
