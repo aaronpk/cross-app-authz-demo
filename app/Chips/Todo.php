@@ -41,7 +41,7 @@ class Todo extends \App\Chips {
   }
 
   public function urlForTodo($id) {
-    return 'http://'.$this->_config['HOSTNAME'].'/todo/'.$id.'.json';
+    return 'http://'.$this->_config['HOSTNAME'].'/todo/'.$id.'_json';
   }
 
   public function saveExpandedLinks($text) {
