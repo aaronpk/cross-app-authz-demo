@@ -86,9 +86,11 @@ class Todo extends \App\Chips {
             }
           } catch(\GuzzleHttp\Exception\TransferException $e) {
             // Something went wrong
+            logger()->debug('HTTP error fetching Todo', ['exception' => $e->getMessage()]);
           }
         } else {
           // Couldn't get a token for this user
+          logger()->debug('Couldn\'t find an access token for this user');
         }
       }
     }
