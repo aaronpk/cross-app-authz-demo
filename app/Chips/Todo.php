@@ -33,8 +33,12 @@ class Todo extends \App\Chips {
   }
 
   public function matches($text) {
+    $regex = $this->regex();
+
+    logger()->debug('Checking for matches of regex: '.$regex);
+
     $matches = [];
-    if(preg_match_all($this->regex(), $text, $m, PREG_OFFSET_CAPTURE)) {
+    if(preg_match_all($regex, $text, $m, PREG_OFFSET_CAPTURE)) {
       return $m;
     }
     return [];
