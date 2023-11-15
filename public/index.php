@@ -51,6 +51,8 @@ $app->group('', function(RouteCollectorProxy $group){
       $group->get('/edit', [Controllers\Wiki::class, 'edit']);
       $group->post('/edit/save', [Controllers\Wiki::class, 'save']);
 
+      $group->post('/delete-access-tokens', [Controllers\Wiki::class, 'delete_access_tokens']);
+
       $group->redirect('/logged-in', '/oauth/acdc');
       $group->get('/oauth/acdc', [Controllers\ACDC::class, 'get']);
       $group->post('/oauth/acdc', [Controllers\ACDC::class, 'post']);

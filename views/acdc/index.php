@@ -15,7 +15,7 @@
     <button id="do-acdc-request" class="btn btn-primary">Request ACDC</button>
 
     <div id="acdc-request" class="hidden">
-      Requesting ACDC using ID Token...<br>
+      Requesting ACDC for <b>Todo0 API</b> using ID Token...<br>
       Posting to <code><?= $org->token_endpoint ?></code>
 
       <details>
@@ -47,7 +47,7 @@
 
     <div id="token-request" class="hidden">
 
-      Requesting Access Token using ACDC...<br>
+      Requesting Access Token at <b>Todo0 API</b> using ACDC...<br>
       Posting to <code><?= $todo_token_endpoint ?></code>
 
       <details>

@@ -92,6 +92,14 @@ class Wiki {
     ]);
   }
 
+  public function delete_access_tokens(ServerRequestInterface $request, ResponseInterface $response, $params): ResponseInterface {
+
+    ORM::for_table('external_tokens')->delete_many();
+  
+    return $response->withStatus(302)
+      ->withHeader('Location', '/wiki/');
+  }
+
   private function _renderWikiHTML(&$page) {
 
     $text = $page->text;

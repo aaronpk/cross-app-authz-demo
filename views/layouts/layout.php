@@ -35,13 +35,20 @@
           <?php endif ?>
         </ul>
         <?php if(isset($user)): ?>
-          <form action="/logout" method="post" id="logout-form">
             <ul class="navbar-nav">
+              <?php if($_ENV['SITE_TYPE'] == 'wiki'): ?>
               <li class="nav-item">
-                <a class="nav-link" href="#">Log Out</a>
+                <form action="/delete-access-tokens" method="post" id="delete-access-tokens">
+                  <a class="nav-link" href="#">Delete Access Tokens</a>
+                </form>
+              </li>
+              <?php endif ?>
+              <li class="nav-item">
+                <form action="/logout" method="post" id="logout-form">
+                  <a class="nav-link" href="#">Log Out</a>
+                </form>
               </li>
             </ul>
-          </form>
         <?php endif ?>
       </div>
     </div>
