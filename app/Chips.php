@@ -38,7 +38,6 @@ abstract class Chips {
       'grant_type' => 'urn:ietf:params:oauth:grant-type:token-exchange',
       'requested_token_type' => 'urn:ietf:params:oauth:token-type:jwt-acdc',
       'resource' => $this->_config['TOKEN_ENDPOINT'],
-      'audience' => $this->_config['CLIENT_ID'],
       'scope' => $this->_config['SCOPES'],
       'subject_token_type' => 'urn:ietf:params:oauth:token-type:id_token',
       'subject_token' => $user->id_token,
@@ -66,17 +65,19 @@ abstract class Chips {
     // Fake an ACDC
     // $acdc = base64_urlencode(json_encode(['typ'=>'acdc+jwt']))
     //   .'.'.base64_urlencode(json_encode([
+    //     'jti' => time().time(),
     //     'iss' => $org->issuer,
     //     'sub' => $user->sub,
-    //     'aud' => '0oad0ulqgzalQFzI45d7',
+    //     'aud' => $this->_config['TOKEN_ENDPOINT'],
     //     'azp' => $this->_config['CLIENT_ID'],
     //     'exp' => time()+600,
     //     'iat' => time(),
-    //     'scopes' => [],
+    //     'scopes' => explode(' ',$this->_config['SCOPES']),
     //   ])).'.'.base64_urlencode('signature');
 
     // $info = [
-    //   'acdc' => $acdc,
+    //   'access_token' => $acdc,
+    //   'acdc_params' => $params,
     //   'token_type' => 'urn:ietf:params:oauth:token-type:jwt-acdc',
     // ];
 

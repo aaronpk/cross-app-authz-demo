@@ -68,11 +68,14 @@ class TokenEndpoint {
     if(!preg_match('/(.+)\.(.+)\.(.+)/', $params['acdc'], $match)) {
       return $this->_jsonError('invalid_grant', 400);
     }
+
     $headerComponent = $match[1];
     $claimsComponent = $match[2];
     $signature = $match[3];
 
     $claims = json_decode(base64_urldecode($claimsComponent), true);
+
+    // echo json_encode(['access_token' => 'foo']); die();
 
     // JWT signature is not yet verified
 
@@ -87,27 +90,31 @@ class TokenEndpoint {
     }
 
     // azp (authorized party) - which client the ACDC was issued to by the IdP.
-    // azp is the client ID in the context of this application, mapping was done by the IdP.
+    // aud is the token endpoint.
     // Validate azp matches client authentication.
     if($claims['azp'] != $client->client_id) {
       return $this->_jsonError('invalid_grant', 400, 'azp ('.$claims['azp'].') does not match client authentication ('.$client->client_id.')');
     }
 
-    // Tenancy is established by the iss + client_id pair in the orgs table
+    // Validate the audience is the token endpoint
+    $tokenEndpoint = $_ENV['BASE_URL'].'oauth/token';
+    if($claims['aud'] != $tokenEndpoint) {
+      return $this->_jsonError('invalid_grant', 400, 'aud ('.$claims['aud'].') does not match this token endpoint');
+    }
 
     // Look up the org by the iss of the token
     $org = ORM::for_table('orgs')
       ->where('issuer', $claims['iss'])
-      ->where('client_id', $claims['aud'])
       ->find_one();
 
     if(!$org) {
-      return $this->_jsonError('invalid_grant', 400, 'Unknown tenant: '.$claims['iss'].' aud='.$claims['aud']);
+      return $this->_jsonError('invalid_grant', 400, 'Unknown tenant: '.$claims['iss']);
     }
 
     // Look up user
     // We should know about them already. What happens if not?
     $user = ORM::for_table('users')
+      ->where('org_id', $org->id)
       ->where('sub', $claims['sub'])
       ->find_one();
 

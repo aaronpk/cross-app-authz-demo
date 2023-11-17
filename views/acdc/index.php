@@ -93,7 +93,7 @@ $(function(){
       $("#acdc-params").text(response.acdc_params);
       $("#acdc-response-body").text(response.text);
 
-      if(response.response.acdc) {
+      if(response.response.access_token) {
         $("#acdc-response .success").removeClass("hidden");
       } else {
         $("#acdc-response .error").removeClass("hidden");
@@ -110,7 +110,7 @@ $(function(){
 
       $.post("/oauth/acdc", {
         step: 'token',
-        acdc: acdc_response.response.acdc,
+        acdc: acdc_response.response.access_token,
       }, function (response){
 
         $("#token-request-params").text(response.token_request_params);
