@@ -92,12 +92,12 @@ class OpenID {
         ]
       ]);
     } catch(\GuzzleHttp\Exception\TransferException $e) {
-      // Log::error($e->getMessage());
+      // logger()->debug($e->getMessage());
       $details = null;
       if($e->hasResponse()) {
         $body = (string)$e->getResponse()->getBody();
         $details = json_decode($body, true);
-        // Log::error((string)$e->getResponse()->getBody());
+        // logger()->debug((string)$e->getResponse()->getBody());
       }
       return render($response, 'login/error', [
         'error' => json_encode($details)
