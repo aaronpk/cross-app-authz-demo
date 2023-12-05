@@ -1,0 +1,64 @@
+version: '3'
+services:
+    web_todo:
+        image: nginx:latest
+        ports:
+            - "9090:80"
+        volumes:
+            - ./docker/todo.nginx.conf:/etc/nginx/conf.d/default.conf
+            - ./src:/var/www
+        depends_on:
+            - php_todo
+    php_todo:
+        build:
+            context: .
+            dockerfile: docker/todo.dockerfile
+        volumes:
+            - vendor:/var/www/vendor
+            - ./src:/var/www
+        depends_on:
+            - mysql_todo
+    mysql_todo:
+        image: mariadb:latest
+        environment:
+            MYSQL_ROOT_PASSWORD: 'avocado'
+            MYSQL_USER: 'cloudmaker'
+            MYSQL_PASSWORD: 'avocado'
+            MYSQL_DATABASE: 'todo0'
+        volumes:
+            - mysqldata_todo:/var/lib/mysql
+        ports:
+            - 9091:3306
+    web_wiki:
+        image: nginx:latest
+        ports:
+            - "7070:80"
+        volumes:
+            - ./docker/wiki.nginx.conf:/etc/nginx/conf.d/default.conf
+            - ./src:/var/www
+        depends_on:
+            - php_wiki
+    php_wiki:
+        build:
+            context: .
+            dockerfile: docker/wiki.dockerfile
+        volumes:
+            - vendor:/var/www/vendor
+            - ./src:/var/www
+        depends_on:
+            - mysql_wiki
+    mysql_wiki:
+        image: mariadb:latest
+        environment:
+            MYSQL_ROOT_PASSWORD: 'avocado'
+            MYSQL_USER: 'cloudmaker'
+            MYSQL_PASSWORD: 'avocado'
+            MYSQL_DATABASE: 'wiki0'
+        volumes:
+            - mysqldata_wiki:/var/lib/mysql
+        ports:
+            - 7071:3306
+volumes:
+    mysqldata_todo: {}
+    mysqldata_wiki: {}
+    vendor:
