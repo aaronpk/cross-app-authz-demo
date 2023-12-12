@@ -1,6 +1,6 @@
 # Cross-App Authorization Demo Apps
 
-This is a simple demo application that implements both the Requesting Application and Resource Application described in [this spec](https://github.com/oktadev/draft-enterprise-cross-app-authz).
+This is a simple demo application that implements both the Requesting Application and Resource Application described in [this spec](https://oktadev.github.io/draft-parecki-oauth-cross-domain-authorization/draft-parecki-oauth-cross-domain-authorization.html).
 
 Note: This application does not use production-grade security mechanisms and should not be used as a reference for basic security things. In particular, this stores client secrets as plaintext in the database. This is to make debugging easier but should not be done in production.
 
