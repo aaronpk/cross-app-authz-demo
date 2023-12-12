@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `orgs`;
 CREATE TABLE `orgs` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `domain` varchar(255) NOT NULL,
@@ -9,6 +10,7 @@ CREATE TABLE `orgs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+DROP TABLE IF EXISTS `todos`;
 CREATE TABLE `todos` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` int(11) NOT NULL,
@@ -19,6 +21,7 @@ CREATE TABLE `todos` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+DROP TABLE IF EXISTS `pages`;
 CREATE TABLE `pages` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` int(11) NOT NULL,
@@ -32,6 +35,7 @@ CREATE TABLE `pages` (
   UNIQUE KEY `slug` (`org_id`,`slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` int(11) NOT NULL,
@@ -45,6 +49,7 @@ CREATE TABLE `users` (
   KEY `org_sub` (`org_id`,`sub`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+DROP TABLE IF EXISTS `tokens`;
 CREATE TABLE `tokens` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -57,6 +62,7 @@ CREATE TABLE `tokens` (
   KEY `token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+DROP TABLE IF EXISTS `clients`;
 CREATE TABLE `clients` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,

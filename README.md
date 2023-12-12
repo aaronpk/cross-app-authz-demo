@@ -7,13 +7,65 @@ Note: This application does not use production-grade security mechanisms and sho
 
 ## Getting Started
 
-### Dependencies
+### Docker
+
+```
+docker-compose up
+```
+
+This will spin up 2 copies of the stack, one for the wiki app and one for the todo app.
+
+Task0: http://localhost:9090/
+
+TinyWiki: http://localhost:7070/
+
+Create the database tables with the following commands
+
+```
+docker-compose exec php_wiki php sql/initdb.php
+docker-compose exec php_todo php sql/initdb.php
+```
+
+Pick an email domain to use for IdP routing on the login page. When you enter an email address at this domain in the login page, the app will route you to the configured OIDC connection for this domain.
+
+Find your org issuer URL (available in the top right dropdown menu in the admin dashboard) which you'll need when configuring the integrations.
+
+Create two applications in your Okta org:
+
+* Name: TinyWiki
+* Application Type: Native
+* Redirect URI: `http://localhost:7070/openid/callback/1`
+* Add a client secret
+* Enable the "Token Exchange" grant type
+
+Run the following command with the client ID and secret for this app, and the email domain and issuer from the earlier steps.
+
+```
+docker-compose exec php_wiki php scripts/create-org.php example.com dev-XXXXXXX.okta.com CLIENT_ID CLIENT_SECRET
+```
+
+* Name: Task0
+* Application Type: Web
+* Redirect URI: `http://localhost:9090/openid/callback/1`
+
+Run the following command with the client ID and secret for this app, and the email domain and issuer from the earlier steps.
+
+```
+docker-compose exec php_todo php scripts/create-org.php example.com dev-XXXXXXX.okta.com CLIENT_ID CLIENT_SECRET
+```
+
+Now you can log in!
+
+
+### Manual Setup
+
+#### Dependencies
 
 * [MariaDB](https://mariadb.org)
 * [PHP 8.2](https://php.net/)
 * [Composer](https://getcomposer.org)
 
-### Initial Setup
+#### Initial Setup
 
 * Set up MySQL, create a database, and grant a user permissions to the database
     * `CREATE DATABASE todo_app; GRANT ALL PRIVILEGES ON todo_app.* TO 'todo_app'@'127.0.0.1' IDENTIFIED BY 'todo_app';`
@@ -28,7 +80,7 @@ Note: This application does not use production-grade security mechanisms and sho
 
 Note: The built-in PHP server will think that URLs ending in `.json` are files and won't route them to the application. If you are trying to fetch a URL like `http://localhost:8080/todo/1.json`, there is an additional route for that at `http://localhost:8080/todo/1_json`.
 
-### Identity Provider Configuration
+#### Identity Provider Configuration
 
 * Create an application at the IdP for the todo app and the wiki app
 * Add a record to the `orgs` table with the IdP config and client ID and secret
@@ -43,9 +95,9 @@ When running the resource application, you'll need to have a client registered f
 
 ## Usage
 
-* Log in to the Resource Application (todo app) and create one or more todo items
+* Log in to the Resource Application (Task0) and create one or more todo items
 * Copy the URL of the todo item
-* Log in to the Requesting Application (wiki app)
+* Log in to the Requesting Application (TinyWiki)
 * Edit the home page and paste in the todo item URL
 * The wiki should obtain an ACDC from the IdP, then exchange that for an access token at the Resource App, then fetch the todo item and render it with the name and icon in the wiki page
 
