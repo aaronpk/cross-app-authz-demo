@@ -22,8 +22,8 @@ TinyWiki: http://localhost:7070/
 Create the database tables with the following commands
 
 ```
-docker-compose exec php_wiki php sql/initdb.php
-docker-compose exec php_todo php sql/initdb.php
+docker-compose exec wiki php sql/initdb.php
+docker-compose exec todo php sql/initdb.php
 ```
 
 Pick an email domain to use for IdP routing on the login page. When you enter an email address at this domain in the login page, the app will route you to the configured OIDC connection for this domain.
@@ -41,7 +41,7 @@ Create two applications in your Okta org:
 Run the following command with the client ID and secret for this app, and the email domain and issuer from the earlier steps.
 
 ```
-docker-compose exec php_wiki php scripts/create-org.php example.com dev-XXXXXXX.okta.com CLIENT_ID CLIENT_SECRET
+docker-compose exec wiki php scripts/create-org.php example.com dev-XXXXXXX.okta.com CLIENT_ID CLIENT_SECRET
 ```
 
 * Name: Task0
@@ -51,7 +51,7 @@ docker-compose exec php_wiki php scripts/create-org.php example.com dev-XXXXXXX.
 Run the following command with the client ID and secret for this app, and the email domain and issuer from the earlier steps.
 
 ```
-docker-compose exec php_todo php scripts/create-org.php example.com dev-XXXXXXX.okta.com CLIENT_ID CLIENT_SECRET
+docker-compose exec todo php scripts/create-org.php example.com dev-XXXXXXX.okta.com CLIENT_ID CLIENT_SECRET
 ```
 
 Now you can log in!

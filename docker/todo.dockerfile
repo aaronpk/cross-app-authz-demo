@@ -14,3 +14,11 @@ COPY --from=composer /var/www/vendor/ vendor
 RUN docker-php-ext-install pdo pdo_mysql
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 ENV ENV .todo.env.docker
+
+### Install nginx
+RUN apt update
+RUN apt install nginx -y
+RUN rm /etc/nginx/sites-enabled/default 
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && ln -sf /dev/stderr /var/log/nginx/error.log
+
+CMD php-fpm -D && nginx -g "daemon off;"
