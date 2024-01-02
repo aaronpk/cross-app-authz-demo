@@ -9,6 +9,10 @@ primary_region = "sjc"
 [build]
   dockerfile = "./docker/wikisrv.fly.dockerfile"
 
+[env]
+  DB_HOST = "mysql-srv.internal"
+  DB_NAME = "wiki"
+
 [http_service]
   internal_port = 80
   force_https = true

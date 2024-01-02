@@ -13,7 +13,11 @@ COPY --from=composer /var/www/vendor/ vendor
 
 RUN docker-php-ext-install pdo pdo_mysql
 RUN pecl install xdebug && docker-php-ext-enable xdebug
+
 ENV ENV .wiki.env.docker
+ENV DB_HOST=mysql
+ENV DB_USER=cloudmaker
+ENV DB_PASS=avocado
 
 ### Install nginx
 RUN apt update
