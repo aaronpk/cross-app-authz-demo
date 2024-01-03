@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for wiki-srv on 2023-12-13T14:28:57-08:00
+# fly.toml app configuration file generated for todo-srv on 2024-01-02T15:00:37-08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "wiki-srv"
+app = "todo-srv"
 primary_region = "sjc"
 
 [build]
@@ -11,8 +11,8 @@ primary_region = "sjc"
 
 [env]
   DB_HOST = "mysql-srv.internal"
-  DB_NAME = "wiki"
-  ENV=".wiki.env.docker"
+  DB_NAME = "todo"
+  ENV=".todo.env.docker"
 
 [http_service]
   internal_port = 80

@@ -14,11 +14,10 @@ COPY --from=composer /var/www/vendor/ vendor
 
 RUN docker-php-ext-install pdo pdo_mysql
 RUN pecl install xdebug && docker-php-ext-enable xdebug
-ENV ENV .wiki.env.docker
 
 
 ### Setup web server
-COPY ./docker/wiki.fly.nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/app.fly.nginx.conf /etc/nginx/conf.d/default.conf
 COPY ./src /var/www
 
 RUN apt update
