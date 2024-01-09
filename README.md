@@ -1,4 +1,3 @@
-
 # Cross-App Authorization Demo Apps
 
 This is a simple demo application that implements both the Requesting Application and Resource Application described in [this spec](https://oktadev.github.io/draft-parecki-oauth-cross-domain-authorization/draft-parecki-oauth-cross-domain-authorization.html).
